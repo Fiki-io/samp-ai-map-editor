@@ -16300,6 +16300,111 @@ export const SAMP_OBJECTS: SampObjectInfo[] = [
       1.36,
       1.0
     ]
+  },
+  {
+    "id": 3051,
+    "name": "lift_dr (Elevator Door)",
+    "txd": "bigwhitesfe",
+    "category": "doors",
+    "dimensions": [1.6, 2.4, 0.2]
+  },
+  {
+    "id": 1536,
+    "name": "Gen_doorEXT15 (Double Entrance Door)",
+    "txd": "adam_v_doort",
+    "category": "doors",
+    "dimensions": [2.0, 2.5, 0.2]
+  },
+  {
+    "id": 1753,
+    "name": "SWANK_COUCH_1 (Modern Luxury Couch)",
+    "txd": "mrk_couches2",
+    "category": "living",
+    "dimensions": [2.2, 0.9, 0.9]
+  },
+  {
+    "id": 1811,
+    "name": "MED_DIN_CHAIR_5 (Executive Office Chair)",
+    "txd": "int_office",
+    "category": "office",
+    "dimensions": [0.7, 0.9, 0.7]
+  },
+  {
+    "id": 2162,
+    "name": "MED_OFFICE_UNIT_1 (Reception Service Counter)",
+    "txd": "int_office",
+    "category": "office",
+    "dimensions": [2.0, 1.1, 1.0]
+  },
+  {
+    "id": 2163,
+    "name": "MED_OFFICE_UNIT_2 (Reception Counter Corner)",
+    "txd": "int_office",
+    "category": "office",
+    "dimensions": [1.2, 1.1, 1.2]
+  },
+  {
+    "id": 2315,
+    "name": "CJ_TV_TABLE4 (Lounge Coffee Table)",
+    "txd": "cj_furniture",
+    "category": "living",
+    "dimensions": [1.4, 0.5, 0.7]
+  },
+  {
+    "id": 2515,
+    "name": "CJ_BS_SINK (Restroom Wash Sink)",
+    "txd": "cj_bathroom",
+    "category": "bathroom",
+    "dimensions": [0.8, 0.9, 0.6]
+  },
+  {
+    "id": 2528,
+    "name": "CJ_TOILET3 (Restroom Toilet)",
+    "txd": "cj_bathroom",
+    "category": "bathroom",
+    "dimensions": [0.6, 0.8, 0.7]
+  },
+  {
+    "id": 3858,
+    "name": "ottosmash1 (Glass Railing Balustrade)",
+    "txd": "cj_tv",
+    "category": "walls",
+    "dimensions": [2.5, 1.2, 0.1]
+  },
+  {
+    "id": 3859,
+    "name": "ottosmash04 (Glass Partition Wall)",
+    "txd": "cj_tv",
+    "category": "walls",
+    "dimensions": [2.5, 2.0, 0.1]
+  },
+  {
+    "id": 945,
+    "name": "WS_CF_LAMPS (Recessed Ceiling Lamp)",
+    "txd": "csrspalace02",
+    "category": "lighting",
+    "dimensions": [1.2, 0.2, 0.6]
+  },
+  {
+    "id": 14687,
+    "name": "Int_tat_lights02 (Modern Ceiling Spotlight)",
+    "txd": "cj_lights",
+    "category": "lighting",
+    "dimensions": [0.8, 0.2, 0.8]
+  },
+  {
+    "id": 1897,
+    "name": "wheel_support (Balustrade Metal Bracket)",
+    "txd": "wheels",
+    "category": "props",
+    "dimensions": [0.2, 1.1, 0.2]
+  },
+  {
+    "id": 19087,
+    "name": "Rope1 (Black Handrail Metal Pipe)",
+    "txd": "airportgnd_sfse",
+    "category": "props",
+    "dimensions": [2.5, 0.1, 0.1]
   }
 ];
 
@@ -16311,7 +16416,13 @@ const ID_EN_MAP: Record<string, string[]> = {
   meja: ['table', 'desk', 'counter', 'bar'],
   kursi: ['chair', 'seat', 'stool', 'bench', 'armchair'],
   sofa: ['sofa', 'couch', 'armchair', 'settee'],
-  pintu: ['door', 'gate', 'portal'],
+  pintu: ['door', 'gate', 'portal', 'lift_dr'],
+  lift: ['lift', 'elevator', 'lift_dr'],
+  elevator: ['lift', 'elevator', 'lift_dr'],
+  resepsionis: ['reception', 'counter', 'office_unit', 'med_office_unit'],
+  washtafel: ['sink', 'basin', 'cj_bs_sink'],
+  kaca: ['glass', 'ottosmash', 'window'],
+  railing: ['rope', 'wheel_support', 'handrail', 'barrier', 'ottosmash'],
   jendela: ['window', 'glass'],
   tangga: ['stair', 'ladder', 'steps'],
   kasur: ['bed', 'mattress'],
@@ -16320,7 +16431,7 @@ const ID_EN_MAP: Record<string, string[]> = {
   lampu: ['light', 'lamp', 'neon', 'chandelier', 'lantern'],
   dapur: ['kitchen', 'sink', 'stove', 'oven', 'fridge'],
   kulkas: ['fridge', 'refrigerator'],
-  toilet: ['toilet', 'bath', 'shower', 'sink'],
+  toilet: ['toilet', 'cj_toilet', 'wc', 'restroom', 'bath', 'shower', 'sink'],
   pagar: ['fence', 'barrier', 'gate', 'wall'],
   komputer: ['pc', 'computer', 'monitor'],
   mobil: ['vehicle', 'car'],

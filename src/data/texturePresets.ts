@@ -257,6 +257,88 @@ export const TEXTURE_PRESETS: TexturePreset[] = [
     textureName: 'wall014',
     previewColor: '#1e242d',
     description: 'Kaca gelap riben untuk partisi kamar mandi & jendela'
+  },
+
+  // ── COMMUNITY MASTERCLASS PRESETS (Dari Pro Mapper SA-MP) ───────────────────
+  {
+    id: 'comm_pure_white',
+    name: 'Clean White Drywall (Airport White)',
+    category: 'walls',
+    modelId: 10765,
+    txdName: 'airportgnd_sfse',
+    textureName: 'white',
+    previewColor: '#ffffff',
+    description: 'Tekstur dinding & slab paling populer di SA-MP. Putih bersih flat tanpa bintik, sempurna untuk diwarnai hex tint'
+  },
+  {
+    id: 'comm_matte_black',
+    name: 'Matte Black Metal / Trim',
+    category: 'metal',
+    modelId: 10765,
+    txdName: 'airportgnd_sfse',
+    textureName: 'black64',
+    previewColor: '#121212',
+    description: 'Hitam pekat matte untuk railing pipa, frame kusen, dan lis langit-langit'
+  },
+  {
+    id: 'comm_hotel_marble',
+    name: 'Grand Hotel Glossy Marble Tile',
+    category: 'tiles',
+    modelId: 15034,
+    txdName: 'genhotelsave',
+    textureName: 'bathtile05_int',
+    previewColor: '#e3dfd3',
+    description: 'Ubin marmer mewah berkilau standar lobby hotel bintang 5 & balai kota (City Hall)'
+  },
+  {
+    id: 'comm_cop_carpet',
+    name: 'Official Blue-Grey Office Carpet',
+    category: 'carpet',
+    modelId: 14847,
+    txdName: 'mp_policesf',
+    textureName: 'mp_cop_carpet',
+    previewColor: '#3d4a58',
+    description: 'Karpet kantor resmi instansi kepolisian, kejaksaan, dan ruang rapat eksekutif'
+  },
+  {
+    id: 'comm_polished_wood',
+    name: 'Polished Oak / Walnut Wood',
+    category: 'wood',
+    modelId: 14847,
+    txdName: 'ab_trukstpc',
+    textureName: 'mp_CJ_WOOD5',
+    previewColor: '#633918',
+    description: 'Kayu jati/oak dipoles mewah untuk meja resepsionis dan panel dinding VIP'
+  },
+  {
+    id: 'comm_elevator_doors',
+    name: 'Brushed Steel Elevator Doors',
+    category: 'metal',
+    modelId: 3051,
+    txdName: 'bigwhitesfe',
+    textureName: 'liftdoors_kb_256',
+    previewColor: '#8a9199',
+    description: 'Tekstur pintu lift baja tahan karat (stainless steel) untuk shaft vertikal antar lantai'
+  },
+  {
+    id: 'comm_green_glass',
+    name: 'Architectural Safety Glass (Greenish Clear)',
+    category: 'glass',
+    modelId: 3858,
+    txdName: 'cj_tv',
+    textureName: 'green_glass_64',
+    previewColor: '#86b09e',
+    description: 'Kaca railing balkon mezzanine & partisi modern semi-transparan'
+  },
+  {
+    id: 'comm_brushed_metal',
+    name: 'Brushed Industrial Metal',
+    category: 'metal',
+    modelId: 5042,
+    txdName: 'bombshop_las',
+    textureName: 'greymetal',
+    previewColor: '#5c6066',
+    description: 'Baja industrial abu-abu untuk balok penyangga dan ventilasi AC'
   }
 ];
 

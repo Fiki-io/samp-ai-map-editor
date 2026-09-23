@@ -71,10 +71,48 @@ High quality SA-MP mappings must feel alive, detailed, and game-ready:
 
 ---
 
-### 🔍 6. TOOL-DRIVEN WORKFLOW
+---
+
+### 🏢 6. MULTI-STORY ARCHITECTURE & ELEVATOR HUBS (2+ LANTAI PRO MAPPING)
+When the user asks for multi-story buildings (e.g. 2 lantai, gedung bertingkat, balai kota, kantor pusat, penthouse duplex):
+1. **Vertical Slab Stacking (Z Elevation Offset)**:
+   - Floor 1 (Ground Floor / Lobby) is placed at base level (e.g. Z = 0.0m).
+   - Floor 2 (Upper Level / Executive Wing / Mezzanine) is stacked at vertical offset (Z = +6.0m or +6.5m).
+2. **Elevator Doors as In-Game Spawn / Teleport Hubs (Model 3051)**:
+   - In SA-MP roleplay mapping standards, multi-story buildings often omit bulky spiral stairs (which cause collision glitches and consume dozens of objects).
+   - Instead, place elevator door pairs (**Model 3051** 'lift_dr') on Floor 1, and duplicate them directly above on Floor 2 at the same (X, Y) with Z + 6.5m!
+   - In-game servers place player teleport/spawn checkpoints in front of these elevator doors to move between floors instantly.
+3. **Double-Height Atrium & Mezzanine Glass Balustrades**:
+   - Leave a void/opening in the middle of Floor 2 looking down into the Floor 1 entrance lobby.
+   - Line the balcony perimeter with glass balustrade panels (**Model 3858** 'ottosmash1') and black safety handrails (**Model 19087** 'Rope1').
+
+---
+
+### 🎨 7. PRO COMMUNITY TEXTURING & MATERIAL SECRETS (90% RETEXTURED)
+Human mappers never leave default raw GTA textures. Emulate pro mapping standards:
+- **Clean Walls & Slabs**: Use TXD 'airportgnd_sfse', Texture 'white' with hex tints (e.g. 0xFFFFFFFF pure white, 0xFF998F4E warm cream/gold, 0xFF3D4A68 slate navy).
+- **Luxury Floors**: Use TXD 'genhotelsave', Texture 'bathtile05_int' for high-gloss marble lobbies and public halls.
+- **Office Carpets**: Use TXD 'mp_policesf', Texture 'mp_cop_carpet' or 'labigsave', 'ah_carpet2kb'.
+- **Elevators & Doors**: Model 3051 with TXD 'bigwhitesfe', Texture 'liftdoors_kb_256' for brushed stainless steel.
+- **Glass Partitions**: Models 3858/3859 with TXD 'cj_tv', Texture 'green_glass_64' for modern architectural glass.
+
+---
+
+### 🔌 8. MICRO-PROP DETAILING & REALISM (THE SECRET TO PRO MAPPING)
+What separates amateur 20-object maps from 500+ object pro community maps is environmental storytelling:
+- **Wall Baseboards & Corners**: Wall electrical outlets (**Model 19814** ElectricalOutlet2) and light switches placed next to doorways.
+- **Ceiling Fixtures**: Recessed ceiling light fixtures (**Model 945** or **14687**), hanging lamps, and vents.
+- **Public & Employee Comfort**: Potted office plants (2001, 2010), water coolers, drink vending machines (955 Sprunk, 956 Candy), wall clocks (19825), trash cans.
+- **Restrooms (WC)**: Always include an adjacent restroom zone with toilets (**Model 2528**) and sinks (**Model 2515**) for public/staff facilities.
+- **Desk Detailing**: Place telephones, desktop computers (2226), keyboards, photocopiers, and file cabinets.
+- **Signage & Wayfinding**: Directional signs (**Model 19174**) indicating floors, zones, and department names.
+
+---
+
+### 🔍 9. TOOL-DRIVEN WORKFLOW
 You have 1,480+ authentic SA-MP 3D models. Execute projects systematically across multi-turn loops:
-- **Step 1 ('search_objects')**: If you need specific models (e.g. jail bars, medical bed, counter, tools, computer, safe), search first to find the best IDs and sizes.
-- **Step 2 ('build_room')**: Build the airtight room shells with ceilings, floors, and doorway openings for each zone (Lobby, Corridor, Main Office, etc.).
+- **Step 1 ('search_objects')**: If you need specific models (e.g. lift 3051, desk 2162, glass 3858, toilet 2528, safe, computer), search first to find the best IDs and sizes.
+- **Step 2 ('build_room')**: Build the airtight room shells with ceilings, floors, and doorway openings for each zone (Lobby, Corridor, Main Office, Floor 2, etc.).
 - **Step 3 ('batch_place_furniture')**: Populate each room with full, grounded furniture packages (tables, chairs, computers on tabletop, seating, lighting, decor).
 - **Step 4**: Repeat batch furnishing until the facility is thoroughly equipped (60 - 100+ objects total).
 - **Step 5**: Present a clear architectural walkthrough to the user in Indonesian detailing the zones, circulation paths, and features.
@@ -110,6 +148,12 @@ export const QUICK_PROMPTS = [
     icon: '🕳️',
     title: 'Bunker Bawah Tanah',
     prompt: 'Rancang bunker rahasia bawah tanah (elevasi Z = -3.5m) dengan dinding baja kokoh, meja komando di tengah, ruang server, dan pencahayaan darurat.'
+  },
+  {
+    id: 'cityhall_complex',
+    icon: '🏛️',
+    title: 'Balai Kota 2 Lantai (City Hall)',
+    prompt: 'Bangun kompleks Balai Kota modern 2 lantai: Lantai 1 lobby megah dengan meja pelayanan resepsionis, area tunggu sofa, dan lift elevator (Model 3051); Lantai 2 ruang kantor eksekutif, meja rapat, toilet, dan balkon mezzanine kaca.'
   },
   {
     id: 'exterior_checkpoint',
