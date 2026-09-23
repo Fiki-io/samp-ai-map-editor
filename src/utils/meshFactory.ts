@@ -90,43 +90,43 @@ export async function fetchDFFGeometry(modelId: number): Promise<THREE.BufferGeo
 }
 
 /**
- * Creates high-fidelity 512x512 procedural canvas textures
+ * Creates lightweight, high-performance 256x256 procedural canvas textures
  */
 function createProceduralTexture(type: string, colorHex: string): THREE.CanvasTexture {
   const cacheKey = `${type}_${colorHex}`;
   if (textureCache.has(cacheKey)) return textureCache.get(cacheKey)!;
 
   const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = 256;
+  canvas.height = 256;
   const ctx = canvas.getContext('2d')!;
 
   ctx.fillStyle = colorHex;
-  ctx.fillRect(0, 0, 512, 512);
+  ctx.fillRect(0, 0, 256, 256);
 
   if (type === 'wood') {
     // 4 horizontal wooden planks with distinct grain lines and seams
-    const plankH = 128;
-    for (let p = 0; p < 512; p += plankH) {
+    const plankH = 64;
+    for (let p = 0; p < 256; p += plankH) {
       ctx.fillStyle = 'rgba(0,0,0,0.06)';
-      ctx.fillRect(0, p, 512, 3);
+      ctx.fillRect(0, p, 256, 2);
 
       ctx.fillStyle = 'rgba(255,255,255,0.04)';
-      ctx.fillRect(0, p + 3, 512, 2);
+      ctx.fillRect(0, p + 2, 256, 1);
 
       // Fine wood grain fibers
-      for (let y = p + 8; y < p + plankH - 4; y += 8) {
+      for (let y = p + 4; y < p + plankH - 2; y += 6) {
         ctx.strokeStyle = `rgba(0,0,0,${0.03 + Math.random() * 0.05})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(0, y);
-        ctx.bezierCurveTo(170, y + (Math.random() * 4 - 2), 340, y + (Math.random() * 4 - 2), 512, y);
+        ctx.bezierCurveTo(85, y + (Math.random() * 3 - 1.5), 170, y + (Math.random() * 3 - 1.5), 256, y);
         ctx.stroke();
       }
     }
   } else if (type === 'tile') {
     // 4x4 ceramic tiles with neat beveled edges and dark grout
-    const size = 128;
+    const size = 64;
     ctx.strokeStyle = 'rgba(0,0,0,0.35)';
     ctx.lineWidth = 4;
     for (let x = 0; x <= 512; x += size) {
@@ -282,29 +282,19 @@ export function createObjectMesh(
   // ── 1. USE REAL DFF GEOMETRY if available ──────────────────────────────────
   if (dffGeo) {
     const mesh = new THREE.Mesh(dffGeo, material);
-    mesh.castShadow = true;
+    // Performance optimization: only large structures cast shadows to save 60%+ shadow draw calls
+    const isLargeStructure = cat === 'walls' || cat === 'floors' || (w * h * d > 2.5);
+    mesh.castShadow = isLargeStructure;
     mesh.receiveShadow = true;
     group.add(mesh);
 
-    // Compute edges bounding box
-    dffGeo.computeBoundingBox();
-    const bb = dffGeo.boundingBox!;
-    const bbW = Math.max(bb.max.x - bb.min.x, 0.1);
-    const bbH = Math.max(bb.max.y - bb.min.y, 0.1);
-    const bbD = Math.max(bb.max.z - bb.min.z, 0.1);
-
-    const edgesGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(bbW, bbH, bbD));
-    const edgesMat = new THREE.LineBasicMaterial({
-      color: isSelected ? 0x38bdf8 : 0x334155,
-      opacity: isSelected ? 1 : 0.4,
-      transparent: !isSelected,
-      depthWrite: false
-    });
-    const edgeSeg = new THREE.LineSegments(edgesGeo, edgesMat);
-    edgeSeg.userData = { isEdgeOutline: true };
-    group.add(edgeSeg);
-
+    // Only render bounding selection box when specifically selected to avoid 100+ line draw calls
     if (isSelected) {
+      dffGeo.computeBoundingBox();
+      const bb = dffGeo.boundingBox!;
+      const bbW = Math.max(bb.max.x - bb.min.x, 0.1);
+      const bbH = Math.max(bb.max.y - bb.min.y, 0.1);
+      const bbD = Math.max(bb.max.z - bb.min.z, 0.1);
       addSelectionBox(group, bbW, bbH, bbD);
     }
     return group;

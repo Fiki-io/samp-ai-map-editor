@@ -34,6 +34,7 @@ import {
 
 export default function AiCopilotDrawer() {
   const {
+    currentProject,
     aiDrawerOpen,
     setAiDrawerOpen,
     geminiApiKey,
@@ -49,16 +50,75 @@ export default function AiCopilotDrawer() {
     setCameraPreset
   } = useEditor();
 
+  const projectId = currentProject?.id || 'default_session';
+  const chatStorageKey = `samp_ai_chat_${projectId}`;
+
   const [inputPrompt, setInputPrompt] = useState('');
-  const [messages, setMessages] = useState<AgentMessage[]>([
-    {
-      id: 'welcome',
-      role: 'assistant',
-      content: 'Halo! Saya asisten AI Architect khusus mapping interior GTA SA / SA-MP. Saya memiliki kemampuan **Vision** (bisa melihat kanvas 3D Anda) dan **Function Calling** (bisa menaruh dinding, lantai, furnitur, dan tekstur secara presisi). Mau saya buatkan ruangan apa hari ini?',
-      timestamp: Date.now()
-    }
-  ]);
+  const [messages, setMessages] = useState<AgentMessage[]>([]);
   const [conversationHistory, setConversationHistory] = useState<Array<{ role: 'user' | 'model'; parts: unknown[] }>>([]);
+
+  // Load chat history and memory when active project changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const saved = localStorage.getItem(chatStorageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed.messages) && parsed.messages.length > 0) {
+          setMessages(parsed.messages);
+          setConversationHistory(parsed.conversationHistory || []);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to load project chat history:', e);
+    }
+
+    // Default welcome message for this project
+    setMessages([
+      {
+        id: 'welcome',
+        role: 'assistant',
+        content: `Halo! Saya asisten AI Architect khusus proyek **${currentProject?.name || 'Mapping'}**. Percakapan dan memori desain proyek ini tersimpan khusus dan tidak akan hilang atau tertukar dengan proyek lain. Mau kita rancang apa hari ini?`,
+        timestamp: Date.now()
+      }
+    ]);
+    setConversationHistory([]);
+  }, [projectId, chatStorageKey, currentProject?.name]);
+
+  // Persist chat history whenever messages or conversationHistory change
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (messages.length === 0) return;
+    if (messages.length === 1 && messages[0].id === 'welcome' && conversationHistory.length === 0) {
+      return;
+    }
+    try {
+      localStorage.setItem(chatStorageKey, JSON.stringify({
+        messages,
+        conversationHistory
+      }));
+    } catch (e) {
+      console.warn('Failed to save project chat history:', e);
+    }
+  }, [messages, conversationHistory, chatStorageKey]);
+
+  const handleClearProjectChat = () => {
+    if (confirm(`Bersihkan riwayat percakapan & memori AI untuk proyek "${currentProject?.name || 'ini'}"?`)) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(chatStorageKey);
+      }
+      setMessages([
+        {
+          id: 'welcome',
+          role: 'assistant',
+          content: `Memori percakapan proyek **${currentProject?.name || 'Mapping'}** telah dibersihkan. Silakan beri instruksi baru!`,
+          timestamp: Date.now()
+        }
+      ]);
+      setConversationHistory([]);
+    }
+  };
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeTools, setActiveTools] = useState<ToolCallExecution[]>([]);
   const [showKeyModal, setShowKeyModal] = useState(false);
@@ -373,23 +433,32 @@ export default function AiCopilotDrawer() {
             </div>
             <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
               <span className={`w-1.5 h-1.5 rounded-full ${geminiApiKey ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-              <span>{geminiApiKey ? 'Vision & Tools Aktif' : 'API Key Belum Disetel'}</span>
+              <span className="truncate max-w-[110px] text-slate-300 font-medium">{currentProject?.name || 'Mapping'}</span>
+              <span>•</span>
+              <span>{geminiApiKey ? 'Aktif' : 'No Key'}</span>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-1">
           <button
+            onClick={handleClearProjectChat}
+            title="Reset Memori & Percakapan Proyek Ini"
+            className="p-1.5 rounded-md text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+          </button>
+          <button
             onClick={() => setShowKeyModal(true)}
-            title="Pengaturan API Key"
-            className="p-1.5 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+            title="Pengaturan API Key & Model"
+            className="p-1.5 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <Key className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => setAiDrawerOpen(false)}
             title="Tutup AI Drawer"
-            className="p-1.5 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
           </button>

@@ -347,6 +347,65 @@ export const SUPPORTED_MODELS: ModelOption[] = [
   }
 ];
 
+/**
+ * Fetches Gemini API with automatic exponential backoff retry for 503/429 high demand spikes.
+ */
+async function fetchGeminiWithRetry(
+  endpoint: string,
+  requestBody: Record<string, unknown>,
+  activeModel: string,
+  onRetryNotice?: (notice: string) => void,
+  maxRetries: number = 3
+): Promise<Response> {
+  let attempt = 0;
+  while (attempt <= maxRetries) {
+    attempt++;
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (res.ok) {
+      return res;
+    }
+
+    const errText = await res.text();
+    let errMsg = `Gemini API Error (${res.status})`;
+    try {
+      const parsed = JSON.parse(errText);
+      if (parsed.error?.message) errMsg = parsed.error.message;
+    } catch {
+      errMsg = errText || errMsg;
+    }
+
+    const isTemporarySpike =
+      res.status === 503 ||
+      res.status === 429 ||
+      errMsg.toLowerCase().includes('high demand') ||
+      errMsg.toLowerCase().includes('overloaded') ||
+      errMsg.toLowerCase().includes('resource has been exhausted') ||
+      errMsg.toLowerCase().includes('rate limit');
+
+    if (isTemporarySpike && attempt <= maxRetries) {
+      const waitMs = attempt * 2500; // 2.5s, 5.0s, 7.5s
+      const notice = `Server Google sedang sibuk (high demand). Mencoba ulang otomatis (${attempt}/${maxRetries}) dalam ${waitMs / 1000} detik...`;
+      console.warn(notice);
+      onRetryNotice?.(notice);
+      await new Promise(resolve => setTimeout(resolve, waitMs));
+      continue;
+    }
+
+    if (res.status === 404 || errMsg.toLowerCase().includes('not found') || errMsg.toLowerCase().includes('not available')) {
+      errMsg = `Model "${activeModel}" tidak ditemukan atau sudah tidak tersedia. Pesan: ${errMsg}. Silakan pilih model lain seperti Gemini 3.5 Flash-Lite atau Gemini 3.6 Flash di menu Pengaturan AI Copilot.`;
+    }
+
+    throw new Error(errMsg);
+  }
+
+  throw new Error('Gagal menghubungi model setelah beberapa kali percobaan otomatis.');
+}
+
 export async function runAgentStep(
   apiKey: string,
   userPrompt: string,
@@ -420,27 +479,17 @@ ${userPrompt}`;
     };
 
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(activeModel)}:generateContent?key=${apiKey}`;
-
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody)
+    const res = await fetchGeminiWithRetry(endpoint, requestBody, activeModel, (notice) => {
+      const retryId = `retry_${Date.now()}`;
+      activeToolCalls.push({
+        id: retryId,
+        name: 'auto_retry',
+        args: { message: notice },
+        status: 'running',
+        result: notice
+      });
+      onToolUpdate?.([...activeToolCalls]);
     });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      let errMsg = `Gemini API Error (${res.status})`;
-      try {
-        const parsed = JSON.parse(errText);
-        if (parsed.error?.message) errMsg = parsed.error.message;
-      } catch {
-        errMsg = errText || errMsg;
-      }
-      if (res.status === 404 || errMsg.toLowerCase().includes('not found') || errMsg.toLowerCase().includes('not available')) {
-        errMsg = `Model "${activeModel}" tidak ditemukan atau sudah tidak tersedia. Pesan: ${errMsg}. Silakan pilih model lain seperti Gemini 3.5 Flash-Lite atau Gemini 3.6 Flash di menu Pengaturan AI Copilot.`;
-      }
-      throw new Error(errMsg);
-    }
 
     const data = await res.json();
     const candidate = data.candidates?.[0];
