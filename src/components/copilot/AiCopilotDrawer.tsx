@@ -52,6 +52,11 @@ export default function AiCopilotDrawer() {
     setCameraPreset
   } = useEditor();
 
+  const objectsRef = useRef(objects);
+  useEffect(() => {
+    objectsRef.current = objects;
+  }, [objects]);
+
   const projectId = currentProject?.id || 'default_session';
   const chatStorageKey = `samp_ai_chat_${projectId}`;
 
@@ -190,18 +195,45 @@ export default function AiCopilotDrawer() {
 
     setMessages(prev => [...prev, userMessage]);
 
+    // Live objects tracking to ensure multi-phase tool execution sees newly placed elements immediately
+    const liveObjects = [...objectsRef.current];
+
+    const registerLiveObjects = (newObjs: Array<{ modelId?: number; name?: string; category?: any; position?: any; rotation?: any; dimensions?: any; materials?: any }>, ids: string[]) => {
+      newObjs.forEach((o, idx) => {
+        const mId = o.modelId || 19353;
+        const info = getObjectInfo(mId);
+        liveObjects.push({
+          id: ids[idx] || `live_${Date.now()}_${idx}`,
+          modelId: mId,
+          name: o.name || info?.name || `Object_${mId}`,
+          category: o.category || info?.category || 'props',
+          position: (o.position as [number, number, number]) || [0, 0, 0],
+          rotation: (o.rotation as [number, number, number]) || [0, 0, 0],
+          dimensions: (o.dimensions as [number, number, number]) || info?.dimensions || [1, 1, 1],
+          materials: (o.materials as any) || {},
+          materialTexts: {},
+          visible: true,
+          locked: false
+        });
+      });
+    };
+
     // Build context handlers for the AI agent
     const handlers = {
       buildRoom: (options: BuildRoomOptions) => {
         const generated = generateRoomObjects(options);
-        return batchAddObjects(generated);
+        const ids = batchAddObjects(generated);
+        registerLiveObjects(generated, ids);
+        return ids;
       },
       assembleCluster: (options: AssembleClusterOptions) => {
         const clusterObjs = assembleCluster(options);
-        return batchAddObjects(clusterObjs);
+        const ids = batchAddObjects(clusterObjs);
+        registerLiveObjects(clusterObjs, ids);
+        return ids;
       },
       applyMaterialTheme: (theme: MaterialTheme) => {
-        const updates = applyMaterialThemeToObjects(objects, theme);
+        const updates = applyMaterialThemeToObjects(liveObjects, theme);
         updates.forEach(u => updateObject(u.id, { materials: u.materials }, false));
         return updates.length;
       },
@@ -267,7 +299,9 @@ export default function AiCopilotDrawer() {
             } : undefined
           };
         });
-        return batchAddObjects(formatted);
+        const ids = batchAddObjects(formatted);
+        registerLiveObjects(formatted, ids);
+        return ids;
       },
       createObject: (p: { modelId: number; x: number; y: number; z: number; rx?: number; ry?: number; rz?: number; name?: string; color?: string; textureName?: string }) => {
         let finalZ = p.z;
@@ -294,6 +328,13 @@ export default function AiCopilotDrawer() {
           };
         }
         updateObject(id, updates, true);
+        registerLiveObjects([{
+          modelId: p.modelId,
+          position: [p.x, p.y, finalZ],
+          rotation: [p.rx || 0, p.ry || 0, p.rz || 0],
+          name: p.name,
+          materials: (updates.materials as any)
+        }], [id]);
         return id;
       },
       batchCreateObjects: (list: Array<{ modelId: number; x: number; y: number; z: number; rx?: number; ry?: number; rz?: number; name?: string; color?: string; textureName?: string }>) => {
@@ -321,10 +362,12 @@ export default function AiCopilotDrawer() {
             }
           };
         });
-        return batchAddObjects(formatted);
+        const ids = batchAddObjects(formatted);
+        registerLiveObjects(formatted, ids);
+        return ids;
       },
       modifyObject: (p: { objectId: string; x?: number; y?: number; z?: number; rx?: number; ry?: number; rz?: number; color?: string; textureName?: string }) => {
-        const target = objects.find(o => o.id === p.objectId);
+        const target = liveObjects.find(o => o.id === p.objectId) || objects.find(o => o.id === p.objectId);
         if (!target) return false;
         const updates: Record<string, unknown> = {};
         if (p.x !== undefined || p.y !== undefined || p.z !== undefined) {
@@ -357,13 +400,16 @@ export default function AiCopilotDrawer() {
       },
       deleteObject: (id: string) => {
         deleteObject(id);
+        const idx = liveObjects.findIndex(o => o.id === id);
+        if (idx !== -1) liveObjects.splice(idx, 1);
         return true;
       },
       clearScene: () => {
         clearAll();
+        liveObjects.length = 0;
       },
       getSceneObjects: () => {
-        return objects;
+        return liveObjects;
       },
       captureViewport: () => {
         return captureCanvasImage();
