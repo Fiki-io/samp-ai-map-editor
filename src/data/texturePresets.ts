@@ -339,6 +339,66 @@ export const TEXTURE_PRESETS: TexturePreset[] = [
     textureName: 'greymetal',
     previewColor: '#5c6066',
     description: 'Baja industrial abu-abu untuk balok penyangga dan ventilasi AC'
+  },
+  {
+    id: 'comm_seamless_drywall',
+    name: 'Seamless Modern White Wall',
+    category: 'walls',
+    modelId: 19378,
+    txdName: 'burnsground',
+    textureName: 'newall10_seamless',
+    previewColor: '#f5f5f5',
+    description: 'Tekstur dinding drywall putih modern tanpa sambungan (seamless), tidak bergaris saat disambung panjang'
+  },
+  {
+    id: 'comm_dark_wood',
+    name: 'Dark Walnut Ebony Wood',
+    category: 'wood',
+    modelId: 2132,
+    txdName: 'break_s_bins',
+    textureName: 'CJ_WOOD_DARK',
+    previewColor: '#2b1d14',
+    description: 'Kayu gelap pekat untuk kitchen island, meja makan mewah, perapian, dan ambalan dinding'
+  },
+  {
+    id: 'comm_hotel_wallpanel',
+    name: 'Luxury Hotel Decorative Wall',
+    category: 'walls',
+    modelId: 1499,
+    txdName: 'airport3_las',
+    textureName: 'gnhotelwall02_128',
+    previewColor: '#d6cbb8',
+    description: 'Panel dinding dekoratif hotel bintang 5 untuk kamar tidur utama dan ruang tamu VIP'
+  },
+  {
+    id: 'comm_clear_glass',
+    name: 'Crystal Clear Shower Glass',
+    category: 'glass',
+    modelId: 2308,
+    txdName: 'break_fence3',
+    textureName: 'CJ_FRAME_Glass',
+    previewColor: '#dbeafe',
+    description: 'Kaca bening transparan untuk pintu shower kamar mandi, pigura lukisan, dan meja kaca'
+  },
+  {
+    id: 'comm_parquet_flooring',
+    name: 'Contemporary Parquet Wood Floor',
+    category: 'wood',
+    modelId: 8533,
+    txdName: 'ab_trukstpd',
+    textureName: 'Bow_bar_flooring',
+    previewColor: '#5c7a7a',
+    description: 'Lantai kayu parket bernuansa kehijauan/teal hangat untuk hunian modern kontemporer'
+  },
+  {
+    id: 'comm_subway_tile',
+    name: 'Kitchen Ceramic Subway Tiles',
+    category: 'tiles',
+    modelId: 19445,
+    txdName: 'carls_kit1',
+    textureName: 'wall3',
+    previewColor: '#e0dfdb',
+    description: 'Keramik dinding backsplash dapur dan kamar mandi bersih'
   }
 ];
 

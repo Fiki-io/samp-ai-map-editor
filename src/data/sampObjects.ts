@@ -16405,6 +16405,48 @@ export const SAMP_OBJECTS: SampObjectInfo[] = [
     "txd": "airportgnd_sfse",
     "category": "props",
     "dimensions": [2.5, 0.1, 0.1]
+  },
+  {
+    "id": 1739,
+    "name": "SWANK_DIN_CHAIR_5 (Luxury Dining Chair)",
+    "txd": "cj_tables",
+    "category": "kitchen",
+    "dimensions": [0.6, 0.95, 0.6]
+  },
+  {
+    "id": 2262,
+    "name": "Frame_SLIM_3 (Wall Picture Art Frame)",
+    "txd": "picture_frame_clip",
+    "category": "props",
+    "dimensions": [0.8, 1.1, 0.05]
+  },
+  {
+    "id": 2260,
+    "name": "Frame_SLIM_1 (Square Wall Photo Frame)",
+    "txd": "picture_frame_clip",
+    "category": "props",
+    "dimensions": [0.6, 0.6, 0.05]
+  },
+  {
+    "id": 14407,
+    "name": "Stair_Step_Block (Modular Stair Step)",
+    "txd": "ab_trukstpd",
+    "category": "floors",
+    "dimensions": [1.5, 0.25, 0.4]
+  },
+  {
+    "id": 2920,
+    "name": "police_barrier (Modern Wooden Louver / Slat Screen)",
+    "txd": "pol_barrx",
+    "category": "props",
+    "dimensions": [2.0, 1.0, 0.3]
+  },
+  {
+    "id": 8533,
+    "name": "Large_Floor_Ceiling_Slab (Seamless Slab Box)",
+    "txd": "ab_trukstpd",
+    "category": "floors",
+    "dimensions": [20.0, 0.5, 20.0]
   }
 ];
 
@@ -16413,23 +16455,29 @@ export function getObjectInfo(id: number): SampObjectInfo | undefined {
 }
 
 const ID_EN_MAP: Record<string, string[]> = {
-  meja: ['table', 'desk', 'counter', 'bar'],
-  kursi: ['chair', 'seat', 'stool', 'bench', 'armchair'],
+  meja: ['table', 'desk', 'counter', 'bar', 'island'],
+  kursi: ['chair', 'seat', 'stool', 'bench', 'armchair', 'swank_din'],
   sofa: ['sofa', 'couch', 'armchair', 'settee'],
   pintu: ['door', 'gate', 'portal', 'lift_dr'],
   lift: ['lift', 'elevator', 'lift_dr'],
   elevator: ['lift', 'elevator', 'lift_dr'],
   resepsionis: ['reception', 'counter', 'office_unit', 'med_office_unit'],
   washtafel: ['sink', 'basin', 'cj_bs_sink'],
-  kaca: ['glass', 'ottosmash', 'window'],
-  railing: ['rope', 'wheel_support', 'handrail', 'barrier', 'ottosmash'],
+  kaca: ['glass', 'ottosmash', 'window', 'frame_glass'],
+  railing: ['rope', 'wheel_support', 'handrail', 'barrier', 'ottosmash', 'police_barrier'],
   jendela: ['window', 'glass'],
-  tangga: ['stair', 'ladder', 'steps'],
+  tangga: ['stair', 'ladder', 'steps', 'stair_step'],
   kasur: ['bed', 'mattress'],
   ranjang: ['bed', 'bunk'],
-  lemari: ['wardrobe', 'cabinet', 'cupboard', 'closet'],
+  lemari: ['wardrobe', 'cabinet', 'cupboard', 'closet', 'mkshelf'],
+  perapian: ['fireplace', 'firewood', 'hearth'],
+  lukisan: ['frame', 'picture', 'painting', 'poster', 'frame_slim'],
+  bingkai: ['frame', 'picture', 'frame_slim'],
+  foto: ['frame', 'picture', 'frame_slim'],
+  saklar: ['switch', 'lightswitch'],
+  kopi: ['coffee', 'coffeemachine', 'coffeecup'],
+  dapur: ['kitchen', 'sink', 'stove', 'oven', 'fridge', 'cooker', 'island', 'pan', 'spatula'],
   lampu: ['light', 'lamp', 'neon', 'chandelier', 'lantern'],
-  dapur: ['kitchen', 'sink', 'stove', 'oven', 'fridge'],
   kulkas: ['fridge', 'refrigerator'],
   toilet: ['toilet', 'cj_toilet', 'wc', 'restroom', 'bath', 'shower', 'sink'],
   pagar: ['fence', 'barrier', 'gate', 'wall'],

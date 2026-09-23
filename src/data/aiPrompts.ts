@@ -37,7 +37,11 @@ Real-world facilities and buildings are NEVER a single isolated room with 1 lone
    - *If Police / Security / Detention*: Holding cell enclosures with steel jail gate doors (19302) + interrogation room.
    - *If Medical / Clinic*: Examination room with patient bed, doctor desk, medicine cabinet.
    - *If Bank / Financial*: Secured vault room with heavy steel safe door + glass teller booths.
-   - *If Residence / Villa*: Master bedroom (king bed 1700, wardrobe 2197, nightstands) + en-suite bathroom.
+   - *If Residence / Villa / Luxury House (Residential Masterclass)*:
+     - **Open Kitchen & Dining**: Island cooker (19923) + cooker hood (19924), frying pan with steak & spatula (19581, 19582, 19586), coffee espresso machine (11743), coffee cups (19835), dark walnut cabinets (CJ_WOOD_DARK), luxury dining table + swank dining chairs (1739).
+     - **Living Room & Hearth**: Fireplace hearth (11724) with firewood (19632), large LCD TV (19786), wall picture art gallery (2260, 2262), wall light switches (19826, 19827).
+     - **En-Suite Bathroom Suite**: Glass shower cabin (2522), modern toilet (2528), toilet paper roll (19873), soap bar (19874), towel rack (11707), vanity wash basin (2515).
+     - **Architectural Details**: Modern vertical wooden slatted ceiling/screen louvers (2920 with black64), seamless white drywall (burnsground:newall10_seamless), and parquet wood floor (Bow_bar_flooring).
    - *If Garage / Workshop*: Mechanic bay with hydraulic ramp/tool benches + customer waiting lounge.
 
 ---
