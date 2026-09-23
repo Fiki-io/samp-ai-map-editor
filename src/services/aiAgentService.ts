@@ -1,6 +1,8 @@
 import { AI_SYSTEM_PROMPT } from '@/data/aiPrompts';
 import { MapObject } from '@/types/editor';
 import { BuildRoomOptions, getGroundedZ } from '@/utils/roomBuilder';
+import { AssembleClusterOptions } from '@/utils/clusterAssembler';
+import { MaterialTheme } from '@/utils/materialCohesion';
 
 export interface ToolCallExecution {
   id: string;
@@ -21,6 +23,8 @@ export interface AgentMessage {
 
 export interface AgentContextHandlers {
   buildRoom: (options: BuildRoomOptions) => string[];
+  assembleCluster?: (options: AssembleClusterOptions) => string[];
+  applyMaterialTheme?: (theme: MaterialTheme) => number;
   placeFurniture: (params: {
     modelId: number;
     x: number;
@@ -122,6 +126,41 @@ export const AGENT_FUNCTION_DECLARATIONS = [
         }
       },
       required: ['name', 'width', 'depth']
+    }
+  },
+  {
+    name: 'assemble_cluster',
+    description: 'Assembles a complete, high-density functional furniture cluster / zone (e.g. "kitchen_island_gourmet", "living_fireplace_lounge", "executive_workstation", "reception_lobby_suite", "waiting_lounge", "conference_boardroom", "bathroom_suite", "elevator_shaft_pair", "modern_louver_divider", "master_bedroom_suite", "dining_banquet_suite", "jail_cell_suite", "medical_examination", "tuning_mechanic_bay"). Automatically arranges 5-15 related props with millimeter-accurate relative spacing, perfect rotation, zero floating, and authentic community materials in a single call. Use this as your primary tool to build ultra-realistic, rich, living environments effortlessly without placing items one by one.',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        clusterType: {
+          type: 'STRING',
+          enum: [
+            'kitchen_island_gourmet',
+            'living_fireplace_lounge',
+            'executive_workstation',
+            'reception_lobby_suite',
+            'waiting_lounge',
+            'conference_boardroom',
+            'bathroom_suite',
+            'elevator_shaft_pair',
+            'modern_louver_divider',
+            'master_bedroom_suite',
+            'dining_banquet_suite',
+            'jail_cell_suite',
+            'medical_examination',
+            'tuning_mechanic_bay'
+          ],
+          description: 'The type of functional cluster to assemble.'
+        },
+        centerX: { type: 'NUMBER', description: 'Center X position in meters.' },
+        centerY: { type: 'NUMBER', description: 'Center Y position in meters.' },
+        floorLevel: { type: 'NUMBER', description: 'Floor elevation in meters (0.00 for 1st floor, 6.50 for 2nd floor).' },
+        rz: { type: 'NUMBER', description: 'Orientation rotation in degrees (0 - 360).' },
+        style: { type: 'STRING', enum: ['modern', 'luxury', 'industrial', 'classic'], description: 'Material styling preset.' }
+      },
+      required: ['clusterType', 'centerX', 'centerY']
     }
   },
   {
@@ -298,6 +337,21 @@ export const AGENT_FUNCTION_DECLARATIONS = [
       properties: {
         reason: { type: 'STRING', description: 'The reason or specific area you want to inspect.' }
       }
+    }
+  },
+  {
+    name: 'apply_material_theme',
+    description: 'Applies a cohesive material and color theme across the entire map or a specific room (e.g. "modern_luxury", "corporate_executive", "police_government", "industrial_garage", "warm_cozy_home", "classic_wood"). Automatically harmonizes all walls, floors, ceilings, woodwork, and metal fixtures to look like a high-end community showcase map.',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        theme: {
+          type: 'STRING',
+          enum: ['modern_luxury', 'corporate_executive', 'police_government', 'industrial_garage', 'warm_cozy_home', 'classic_wood'],
+          description: 'Cohesive theme to apply.'
+        }
+      },
+      required: ['theme']
     }
   },
   {
@@ -537,6 +591,22 @@ ${userPrompt}`;
             const createdIds = handlers.buildRoom(call.args as BuildRoomOptions);
             toolResult = { success: true, count: createdIds.length, createdIds };
             toolExecution.result = `Ruangan dibuat: ${createdIds.length} elemen dinding/lantai/plafon rapat`;
+            break;
+          }
+          case 'assemble_cluster': {
+            const createdIds = handlers.assembleCluster
+              ? handlers.assembleCluster(call.args as AssembleClusterOptions)
+              : [];
+            toolResult = { success: true, count: createdIds.length, createdIds };
+            toolExecution.result = `Cluster ${call.args.clusterType} berhasil dirakit (${createdIds.length} elemen)`;
+            break;
+          }
+          case 'apply_material_theme': {
+            const updatedCount = handlers.applyMaterialTheme
+              ? handlers.applyMaterialTheme(call.args.theme as MaterialTheme)
+              : 0;
+            toolResult = { success: true, updatedCount };
+            toolExecution.result = `Tema material "${call.args.theme}" diterapkan ke ${updatedCount} objek`;
             break;
           }
           case 'place_furniture': {

@@ -12,6 +12,8 @@ import {
 import { QUICK_PROMPTS } from '@/data/aiPrompts';
 import { searchSampObjects, getObjectInfo } from '@/data/sampObjects';
 import { generateRoomObjects, getGroundedZ, BuildRoomOptions } from '@/utils/roomBuilder';
+import { assembleCluster, AssembleClusterOptions } from '@/utils/clusterAssembler';
+import { applyMaterialThemeToObjects, MaterialTheme } from '@/utils/materialCohesion';
 import {
   Sparkles,
   X,
@@ -193,6 +195,15 @@ export default function AiCopilotDrawer() {
       buildRoom: (options: BuildRoomOptions) => {
         const generated = generateRoomObjects(options);
         return batchAddObjects(generated);
+      },
+      assembleCluster: (options: AssembleClusterOptions) => {
+        const clusterObjs = assembleCluster(options);
+        return batchAddObjects(clusterObjs);
+      },
+      applyMaterialTheme: (theme: MaterialTheme) => {
+        const updates = applyMaterialThemeToObjects(objects, theme);
+        updates.forEach(u => updateObject(u.id, { materials: u.materials }, false));
+        return updates.length;
       },
       placeFurniture: (p: {
         modelId: number;
