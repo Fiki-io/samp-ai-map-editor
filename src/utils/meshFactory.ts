@@ -50,39 +50,78 @@ export function threeToSampRotation(threeRotRad: [number, number, number]): [num
   ];
 }
 
+let bundleIndexPromise: Promise<Record<string, string>> | null = null;
+const loadedBundles = new Set<string>();
+const loadingBundlePromises = new Map<string, Promise<void>>();
+
+function buildBufferGeometryFromData(data: { vertices: number[]; normals?: number[]; uvs?: number[]; indices?: number[] }): THREE.BufferGeometry {
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(data.vertices, 3));
+  if (data.normals && data.normals.length > 0) {
+    geo.setAttribute('normal', new THREE.Float32BufferAttribute(data.normals, 3));
+  }
+  if (data.uvs && data.uvs.length > 0) {
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(data.uvs, 2));
+  }
+  if (data.indices && data.indices.length > 0) {
+    geo.setIndex(data.indices);
+  }
+  if (!data.normals || data.normals.length === 0) {
+    geo.computeVertexNormals();
+  }
+  geo.userData = { isCachedDFF: true };
+  return geo;
+}
+
 /**
- * Fetch and cache a DFF-based BufferGeometry from /models/{modelId}.json
- * Returns null if model is not available (triggers high-fidelity procedural fallback)
+ * Fetch and cache DFF-based geometries from lightweight category bundles (/models/bundles/{category}.json)
+ * Automatically bundles on-demand, caching 100+ models in memory per category load.
  */
 export async function fetchDFFGeometry(modelId: number): Promise<THREE.BufferGeometry | null> {
   if (geoCache.has(modelId)) return geoCache.get(modelId)!;
 
   try {
-    const res = await fetch(`/models/${modelId}.json`);
-    if (!res.ok) {
+    // 1. Fetch category index once (32 KB)
+    if (!bundleIndexPromise) {
+      bundleIndexPromise = fetch('/models/bundles/index.json')
+        .then(res => res.ok ? res.json() : {})
+        .catch(() => ({}));
+    }
+    const index = await bundleIndexPromise;
+    const bundleFile = index[modelId.toString()];
+
+    if (!bundleFile) {
+      // Not in DFF index, fallback to procedural geometry
       geoCache.set(modelId, null);
       return null;
     }
-    const data = await res.json();
 
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(data.vertices, 3));
-    if (data.normals && data.normals.length > 0) {
-      geo.setAttribute('normal', new THREE.Float32BufferAttribute(data.normals, 3));
-    }
-    if (data.uvs && data.uvs.length > 0) {
-      geo.setAttribute('uv', new THREE.Float32BufferAttribute(data.uvs, 2));
-    }
-    if (data.indices && data.indices.length > 0) {
-      geo.setIndex(data.indices);
-    }
-    if (!data.normals || data.normals.length === 0) {
-      geo.computeVertexNormals();
+    // 2. Load the category bundle if not already loaded or loading
+    if (!loadedBundles.has(bundleFile)) {
+      if (!loadingBundlePromises.has(bundleFile)) {
+        const loadP = (async () => {
+          try {
+            const res = await fetch(`/models/bundles/${bundleFile}`);
+            if (res.ok) {
+              const bundleData = await res.json() as Record<string, { vertices: number[]; normals?: number[]; uvs?: number[]; indices?: number[] }>;
+              for (const [mStr, mData] of Object.entries(bundleData)) {
+                const mNum = parseInt(mStr, 10);
+                if (!isNaN(mNum) && !geoCache.has(mNum)) {
+                  geoCache.set(mNum, buildBufferGeometryFromData(mData));
+                }
+              }
+              loadedBundles.add(bundleFile);
+            }
+          } catch (e) {
+            console.warn(`Failed to load bundle ${bundleFile}:`, e);
+          }
+        })();
+        loadingBundlePromises.set(bundleFile, loadP);
+      }
+      await loadingBundlePromises.get(bundleFile);
     }
 
-    geo.userData = { isCachedDFF: true };
-    geoCache.set(modelId, geo);
-    return geo;
+    return geoCache.get(modelId) || null;
   } catch {
     geoCache.set(modelId, null);
     return null;
